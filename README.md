@@ -1,4 +1,4 @@
-[![Competition](https://make.fun/badge/tiny-stack-vm-01-run-20261122/tacinbau/tiny-stack-vm-01/competition.svg)](https://make.fun/c/tiny-stack-vm-01-run-20261122/leaderboard)
+[![Competition](https://make.fun/badge/tiny-stack-vm-01-run-20261122.svg)](https://make.fun/c/tiny-stack-vm-01-run-20261122/leaderboard)
 [![Rank](https://make.fun/badge/tiny-stack-vm-01-run-20261122/tacinbau/tiny-stack-vm-01/rank.svg)](https://make.fun/c/tiny-stack-vm-01-run-20261122/leaderboard)
 [![Reward](https://make.fun/badge/tiny-stack-vm-01-run-20261122/tacinbau/tiny-stack-vm-01/reward.svg)](https://make.fun/c/tiny-stack-vm-01-run-20261122/leaderboard)
 
