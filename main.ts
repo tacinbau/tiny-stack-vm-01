@@ -3,9 +3,8 @@ import { join } from 'node:path';
 
 const IN = process.env.MAKEFUN_INPUT_DIR ?? '/input';
 const OUT = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-const enc = new TextEncoder();
 
-// Opcode table: [byte, immediate bytes, pops, pushes] for every opcode of the ISA.
+// Opcode table: [byte, imm, pops, pushes].
 const OPS = [[0,0,0,0],[1,1,0,1],[2,4,0,1],[3,0,1,0],[4,0,1,2],[5,0,2,2],[6,0,2,3],[7,0,3,3],[16,0,2,1],[17,0,2,1],[18,0,2,1],[19,0,2,1],[20,0,2,1],[21,0,2,1],[22,0,2,1],[23,0,1,1],[24,0,2,1],[25,0,2,1],[26,0,2,1],[27,0,1,1],[28,0,2,1],[29,0,2,1],[30,0,2,1],[32,0,2,1],[33,0,2,1],[34,0,2,1],[48,2,0,0],[49,2,1,0],[50,2,1,0],[51,2,0,0],[52,0,0,0],[64,0,1,1],[65,0,2,0],[80,0,1,0],[81,0,1,0],[82,0,0,1],[83,0,1,0]];
 const IMM = new Uint8Array(256);
 const POP = new Uint8Array(256);
@@ -13,8 +12,8 @@ const PSH = new Uint8Array(256);
 const KNOWN = new Uint8Array(256);
 for (const [b, i, p, q] of OPS) { IMM[b] = i; POP[b] = p; PSH[b] = q; KNOWN[b] = 1; }
 
-// Runs one program on its input bytes. Returns [output buffer, output length, exit code].
-// Traps return their trap code as the exit code and keep the output written so far.
+// Runs one program. Returns [output, length, exit code].
+// Traps return their code and keep output so far.
 function run(prog, input) {
   const n = prog.length;
   const D = new Int32Array(256); // data stack
@@ -104,11 +103,15 @@ function run(prog, input) {
         break;
       }
       case 80: { // PRINT: decimal ASCII, no newline
-        const bytes = enc.encode(String(D[sp - 1]));
-        if (ol + bytes.length > 65536) return [out, ol, 11];
+        const v = D[sp - 1];
+        let u = v < 0 ? -v : v, d = 1, s = v < 0 ? 1 : 0;
+        for (let t = u; t >= 10; t = (t / 10) | 0) d++;
+        if (ol + d + s > 65536) return [out, ol, 11];
         sp--;
-        out.set(bytes, ol);
-        ol += bytes.length;
+        let p = ol + d + s;
+        do { out[--p] = 48 + u % 10; u = (u / 10) | 0; } while (u);
+        if (s) out[--p] = 45;
+        ol += d + s;
         break;
       }
       case 81: { // PUTC: low byte
